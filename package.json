@@ -9,6 +9,8 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@primeuix/themes": "^2.0.1",
+    "@primevue/forms": "^4.5.3",
     "axios": "^1.13.2",
     "dotenv": "^17.2.3",
     "primevue": "^4.5.0",

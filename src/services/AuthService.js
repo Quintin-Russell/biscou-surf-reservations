@@ -1,13 +1,11 @@
-import { BaseService } from './index.js'
+import BaseService from './BaseService.js'
 
-class AuthService extends BaseService {
-  constructor({ baseEndpoint }) {
+export default class AuthService extends BaseService {
+  constructor(baseEndpoint) {
     super({ baseEndpoint })
   }
 
   async login({ email, password }) {
-    return await this.api.get('/login', { email, password })
+    return await this.api.post('/login', { email, password })
   }
 }
-
-export default new AuthService('/auth')
