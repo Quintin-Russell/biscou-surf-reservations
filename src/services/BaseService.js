@@ -1,7 +1,8 @@
-import { Api } from './index.js'
+import Api from './Api.js'
 
 export default class BaseService {
   constructor({ baseEndpoint }) {
-    this.api = new Api(baseEndpoint)
+    const baseUrl = `${import.meta.env.VITE_API_URI}/${baseEndpoint}`
+    this.api = new Api(baseUrl)
   }
 }

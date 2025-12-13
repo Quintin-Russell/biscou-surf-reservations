@@ -1,23 +1,27 @@
 import axios from 'axios'
 
 export default class Api {
-  constructor(baseEndpoint) {
-    this.api = axios.create({
-      baseURL: `${import.meta.env.API_URI}/${baseEndpoint}`,
-      withCredentials: true
+  constructor(url) {
+    this.instance = axios.create({
+      baseURL: url,
+      withCredentials: true,
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json'
+      }
     })
   }
 
   async get(endpoint, params) {
-    return this.api.get(endpoint, params)
+    return this.instance.get(endpoint, params)
   }
   async post(endpoint, params) {
-    return this.api.post(endpoint, params)
+    return this.instance.post(endpoint, params)
   }
   async patch(endpoint, params) {
-    return this.api.patch(endpoint, params)
+    return this.instance.patch(endpoint, params)
   }
   async delete(endpoint, params) {
-    return this.api.delete(endpoint, params)
+    return this.instance.delete(endpoint, params)
   }
 }
