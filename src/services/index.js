@@ -1,9 +1,7 @@
-import Api from './Api'
 import AuthService from './AuthService'
-import BaseService from './BaseService'
+
+const authService = new AuthService('auth')
 
 export {
-  Api,
-  AuthService,
-  BaseService
+  authService
 }
