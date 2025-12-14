@@ -1,17 +1,19 @@
 <script setup>
 import { ref } from 'vue'
+import { useRouter } from 'vue-router'
 import { InputText, Button } from "primevue"
 import { Form } from '@primevue/forms';
 import { authService } from "../services/index.js"
 
 const email = ref('')
 const password = ref('')
+const router = useRouter()
 
 const onSubmit = async function () {
-  // import create auth here
   try {
     const loginParams = {email: email.value, password: password.value}
-   await authService.login(loginParams)
+    await authService.login(loginParams)
+    await router.push('/home')
   // set user here
   } catch(e) {
     console.log(e)
