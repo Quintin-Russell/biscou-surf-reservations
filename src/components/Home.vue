@@ -1,9 +1,11 @@
 <script setup>
+
 </script>
 
 <template>
-  <router-view/>
+<div>Home</div>
 </template>
 
 <style scoped>
+
 </style>
