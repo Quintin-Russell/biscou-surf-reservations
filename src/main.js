@@ -1,5 +1,7 @@
 // router
 import router from "./router/index.js";
+// store
+import { createPinia } from 'pinia'
 // 3rd-party packages
 import PrimeVue from 'primevue/config'
 import Aura from '@primeuix/themes/aura'
@@ -11,5 +13,15 @@ import { createApp } from 'vue'
 
 createApp(App)
   .use(router)
-  .use(PrimeVue, { theme: { preset: Aura } })
+  .use(createPinia())
+  .use(PrimeVue, { theme: {
+    preset: Aura,
+      options :{
+        cssLayer: {
+          name: 'primevue',
+          order: 'theme, base, primevue'
+        }
+      }
+  } })
   .mount('#app')
+console.log('app mounted')

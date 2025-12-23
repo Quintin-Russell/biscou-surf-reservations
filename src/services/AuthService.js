@@ -8,4 +8,8 @@ export default class AuthService extends BaseService {
   async login({ email, password }) {
     return await this.api.post('/login', { email, password })
   }
+
+  async logout() {
+    return await this.api.post('/logout')
+  }
 }

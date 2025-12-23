@@ -1,9 +1,9 @@
 <script setup>
 import { ref } from 'vue'
-import { useRouter } from 'vue-router'
 import { InputText, Button } from "primevue"
 import { Form } from '@primevue/forms';
-import { authService } from "../services/index.js"
+import {useMeStore} from "../stores/index.js";
+import {useRouter} from "vue-router";
 
 const email = ref('')
 const password = ref('')
@@ -11,10 +11,9 @@ const router = useRouter()
 
 const onSubmit = async function () {
   try {
+    const meStore = useMeStore()
     const loginParams = {email: email.value, password: password.value}
-    await authService.login(loginParams)
-    await router.push('/home')
-  // set user here
+    await meStore.login(loginParams, router)
   } catch(e) {
     console.log(e)
   }
