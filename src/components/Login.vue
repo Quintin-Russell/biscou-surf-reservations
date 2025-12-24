@@ -2,7 +2,7 @@
 import { ref } from 'vue'
 import { InputText, Button } from "primevue"
 import { Form } from '@primevue/forms';
-import {useMeStore} from "../stores/index.js";
+import {useMeStore} from "@/stores/index.js";
 import {useRouter} from "vue-router";
 
 const email = ref('')

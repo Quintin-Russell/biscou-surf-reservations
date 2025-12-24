@@ -12,4 +12,8 @@ export default class AuthService extends BaseService {
   async logout() {
     return await this.api.post('/logout')
   }
+
+  async verifyMe() {
+    return await this.api.get('/current_user')
+  }
 }
