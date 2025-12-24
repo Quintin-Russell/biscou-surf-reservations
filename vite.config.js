@@ -1,4 +1,5 @@
 import { defineConfig } from 'vite'
+import path from 'path'
 import vue from '@vitejs/plugin-vue'
 import tailwindcss from "@tailwindcss/vite"
 
@@ -8,4 +9,16 @@ export default defineConfig({
     vue(),
     tailwindcss()
   ],
+  css: {
+    preprocessorOptions: {
+      scss: {
+        additionalData: `@import "@/assets/scss/global.scss";`
+      }
+    }
+  },
+  resolve: {
+    alias: {
+      '@': path.resolve(__dirname, './src')
+    }
+  }
 })

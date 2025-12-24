@@ -1,5 +1,5 @@
-import Login from "../components/Login.vue";
-import Home from "../views/Home.vue";
+import Login from "@/components/Login.vue";
+import Home from "@/views/Home.vue";
 import {createRouter, createWebHistory} from "vue-router"
 
 const DEFAULT_TITLE = 'Biscou Reservation Manager'
