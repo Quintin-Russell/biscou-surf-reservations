@@ -5,13 +5,15 @@ import { createPinia } from 'pinia'
 // 3rd-party packages
 import PrimeVue from 'primevue/config'
 import Aura from '@primeuix/themes/aura'
+// necessary app startup
+import { webSocketService } from './services'
 // styles
 import '@/style.css'
 // native Vue
 import App from '@/App.vue'
 import { createApp } from 'vue'
 
-createApp(App)
+const app = createApp(App)
   .use(router)
   .use(createPinia())
   .use(PrimeVue, {
@@ -19,4 +21,7 @@ createApp(App)
       preset: Aura
     }
   })
-  .mount('#app')
+
+webSocketService.init()
+
+  app.mount('#app')
