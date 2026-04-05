@@ -13,7 +13,7 @@ export const useMeStore = defineStore('me', {
     },
     async login(params, router) {
       const res = await authService.login(params)
-      await this.setMe(res?.data || res, router)
+      await this.setMe(res, router)
     },
     async logout(router) {
       await authService.logout()

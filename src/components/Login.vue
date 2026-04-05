@@ -1,18 +1,44 @@
 <script setup>
-import { ref } from 'vue'
-import { InputText, Button } from "primevue"
-import { Form } from '@primevue/forms';
-import {useMeStore} from "@/stores/index.js";
-import {useRouter} from "vue-router";
+import BaseLoginForm from "@/components/login/BaseLoginForm.vue"
+import NewUserForm from "@/components/login/NewUserForm.vue"
 
-const email = ref('')
+import {ref} from "vue"
+import {useRouter} from "vue-router"
+import {useMeStore} from "@/stores/index.js"
+import {useFormValidation} from "@/compostables/useFormValidation.js"
+import newUserSchema from '@/validation-schemas/newUserSchema.js'
+// refs
 const password = ref('')
-const router = useRouter()
 
-const onSubmit = async function () {
+// form data and validations
+const {
+  defineField,
+  errors,
+} = useFormValidation(newUserSchema)
+
+const [email, emailAttrs] = defineField('email')
+
+const shouldShowNewUserForm = ref(false)
+
+
+const router = useRouter()
+const meStore = useMeStore()
+
+const showNewUserForm = () => {
+  shouldShowNewUserForm.value = true
+}
+
+const hideNewUserForm = () => {
+  shouldShowNewUserForm.value = false
+}
+
+const handleNewUserLogin = (user) => {
+  meStore.setMe(user, router)
+}
+
+const login = async () => {
   try {
-    const meStore = useMeStore()
-    const loginParams = {email: email.value, password: password.value}
+    const loginParams = {email: email.value.trim(), password: password.value}
     await meStore.login(loginParams, router)
   } catch(e) {
     console.log(e)
@@ -21,16 +47,22 @@ const onSubmit = async function () {
 </script>
 
 <template>
-  <Form class="flex justify-center flex-col gap-4" @submit="onSubmit">
-    <div class="flex flex-col gap-1">
-      <InputText name="email" type="text" placeholder="Email" v-model="email" />
-    </div>
-    <div class="flex flex-col gap-1">
-      <InputText name="password" type="text" placeholder="Password" v-model="password" />
-    </div>
-    <Button type="submit" severity="secondary" label="Submit" />
-  </Form>
+  <NewUserForm
+      v-if="shouldShowNewUserForm"
+      :email="email"
+      @newUserLogin="handleNewUserLogin"
+      @hide="hideNewUserForm"
+  />
+  <BaseLoginForm
+      v-else
+      v-model:email="email"
+      v-model:password="password"
+      :error="errors.email"
+      @isNewUser="showNewUserForm"
+      @login="login"
+  />
 </template>
 
 <style scoped>
+
 </style>

@@ -13,13 +13,13 @@ export default class Api {
   }
 
   async get(endpoint, params) {
-    return this.instance.get(endpoint, params)
+    return await this.instance.get(endpoint, { params })
   }
   async post(endpoint, params) {
-    return this.instance.post(endpoint, params)
+    return await this.instance.post(endpoint, params)
   }
   async patch(endpoint, params) {
-    return this.instance.patch(endpoint, params)
+    return await this.instance.patch(endpoint, params)
   }
   async delete(endpoint, params) {
     return this.instance.delete(endpoint, params)
