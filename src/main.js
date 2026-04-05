@@ -9,6 +9,7 @@ import Aura from '@primeuix/themes/aura'
 import { webSocketService } from './services'
 // styles
 import '@/style.css'
+import '@/assets/scss/primevue-overrides.scss'
 // native Vue
 import App from '@/App.vue'
 import { createApp } from 'vue'

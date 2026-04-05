@@ -5,15 +5,23 @@ export default class AuthService extends BaseService {
     super({ baseEndpoint })
   }
 
+  async emailExists(email) {
+    const res = await this.api.get('/email_exists', { email })
+    return res.data
+  }
+
   async login({ email, password }) {
-    return await this.api.post('/login', { email, password })
+    const res = await this.api.post('/login', { email, password })
+    return res.data
   }
 
   async logout() {
-    return await this.api.post('/logout')
+    const res = await this.api.post('/logout')
+    return res.data
   }
 
   async verifyMe() {
-    return await this.api.get('/current_user')
+    const res = await this.api.get('/current_user')
+    return res.data
   }
 }
