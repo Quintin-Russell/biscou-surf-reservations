@@ -1,15 +1,9 @@
 <script setup>
-import { ref, computed, defineProps, defineEmits } from 'vue'
 import { InputText, Password, Button } from "primevue"
 import { Form } from '@primevue/forms'
 
-import newUserSchema from '@/validation-schemas/newUserSchema.js'
-import { useFormValidation} from "@/compostables/useFormValidation.js"
-
+import { ref, computed, defineProps, defineEmits, inject } from 'vue'
 import { authService } from '@/services'
-
-// manages isNewUser
-// emits: update:isNewUser, login
 
 // props
 const props = defineProps(['email', 'password', 'error'])
@@ -17,15 +11,30 @@ const props = defineProps(['email', 'password', 'error'])
 // emits
 const emit = defineEmits(['login', 'isNewUser', 'update:email', 'update:password'])
 
+// inject
+inject('formValidations')
+
 // refs
 const emailExists = ref(false)
 const couldBeNewUser = ref(false)
 
 // computed
-const primaryButtonText = computed(() => couldBeNewUser.value ? 'Try again' : 'Next')
-const showSecondaryButton = computed(() => couldBeNewUser.value)
-const buttonWidth = computed(() => couldBeNewUser.value ? 'w-45' : 'w-full')
+const buttonProps = computed(() => {
+  const splitView = {
+    primaryText: 'Try Again',
+    secondaryText: 'Sign Up',
+    class: 'w-45'
+  }
+  const onlyPrimary = {
+    primaryText: 'Next',
+    class: 'w-full'
+  }
 
+  return couldBeNewUser.value ? splitView : onlyPrimary
+})
+const primaryButtonText = computed(() => couldBeNewUser.value ? 'Try again' : 'Next')
+
+// methods
 const checkIfEmailIsUser = async function () {
   emailExists.value = await authService.emailExists(props.email.trim())
   couldBeNewUser.value = !emailExists.value
@@ -66,12 +75,13 @@ const onSubmit = function () {
           name="email"
           type="text"
           placeholder="Email"
+          :invalid="error"
           @update:model-value="updateEmail"
       />
       <small v-if="error" class="text-red-400">{{ error }}</small>
       <div class="w-full">
         <div
-            v-if="showSecondaryButton"
+            v-if="'secondaryText' in buttonProps"
             class="text-red-400"
         >
           Hmm, we don't recognize that email
@@ -79,16 +89,17 @@ const onSubmit = function () {
         <div class="flex w-full justify-between">
           <Button
               v-if="!emailExists"
-              :class="buttonWidth"
-              :severity="showSecondaryButton ? 'warn' : 'secondary'"
-              :label="primaryButtonText"
+              :class="buttonProps.class"
+              :severity="'secondaryText' in buttonProps ? 'warn' : 'secondary'"
+              :label="buttonProps.primaryText"
+              :disabled="!email"
               @click="handlePrimaryButtonClick"
           />
           <Button
-              v-if="showSecondaryButton"
-              :class="buttonWidth"
+              v-if="'secondaryText' in buttonProps"
+              :class="buttonProps.class"
               severity="secondary"
-              label="Sign up"
+              :label="buttonProps.secondaryText"
               @click="emit('isNewUser')"
           />
         </div>

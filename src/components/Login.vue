@@ -2,28 +2,29 @@
 import BaseLoginForm from "@/components/login/BaseLoginForm.vue"
 import NewUserForm from "@/components/login/NewUserForm.vue"
 
-import {ref} from "vue"
-import {useRouter} from "vue-router"
-import {useMeStore} from "@/stores/index.js"
-import {useFormValidation} from "@/compostables/useFormValidation.js"
-import newUserSchema from '@/validation-schemas/newUserSchema.js'
+import { ref, provide } from "vue"
+import { useRouter } from "vue-router"
+import { useMeStore } from "@/stores/index.js"
+import { useFormValidation } from "@/compostables/useFormValidation.js"
+import newUserSchema from '@/helpers/validation-schemas/newUserSchema.js'
+
 // refs
 const password = ref('')
-
-// form data and validations
-const {
-  defineField,
-  errors,
-} = useFormValidation(newUserSchema)
-
-const [email, emailAttrs] = defineField('email')
-
 const shouldShowNewUserForm = ref(false)
 
+// form data and validations
+const formValidations = useFormValidation(newUserSchema)
+const { defineField, errors } = formValidations
+const [email, emailAttrs] = defineField('email')
 
+// provide
+provide('formValidations', formValidations)
+
+// misc
 const router = useRouter()
 const meStore = useMeStore()
 
+// methods
 const showNewUserForm = () => {
   shouldShowNewUserForm.value = true
 }
@@ -41,7 +42,7 @@ const login = async () => {
     const loginParams = {email: email.value.trim(), password: password.value}
     await meStore.login(loginParams, router)
   } catch(e) {
-    console.log(e)
+    console.error('Error logging in: ', e)
   }
 }
 </script>

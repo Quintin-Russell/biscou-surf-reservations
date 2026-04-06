@@ -8,8 +8,12 @@ export const useMeStore = defineStore('me', {
   getters: {},
   actions: {
     async initialize(router) {
-      const res = await authService.verifyMe()
-      await this.setMe(res?.data || res, router)
+      try {
+        const res = await authService.verifyMe()
+        await this.setMe(res?.data || res, router)
+      } catch (err) {
+        console.error('Could not set user: ', err)
+      }
     },
     async login(params, router) {
       const res = await authService.login(params)
