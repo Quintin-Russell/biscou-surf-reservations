@@ -1,18 +1,40 @@
 <script setup>
-  import { defineProps, defineEmits, computed } from "vue"
   import { Form } from '@primevue/forms'
   import {InputText, Fieldset, Select, Button, Password} from "primevue"
 
-  import { useFormValidation} from "@/compostables/useFormValidation.js"
+  import { defineProps, defineEmits, computed, inject } from "vue"
+  import { isEmpty } from "lodash"
   import countryData from '@/helpers/country-data.js'
-  import newUserSchema from '@/validation-schemas/newUserSchema.js'
-  import { userService } from "@/services";
+  import { userService } from "@/services"
 
   // props
   const props = defineProps(['email'])
 
   // emits
   const emit = defineEmits(['newUserLogin', 'hide'])
+
+  // inject
+  const formValidations = inject('formValidations')
+  const {
+    defineField,
+    isDirty,
+    isValid,
+    validateForm,
+    submitError,
+    isSubmitting,
+    errors,
+    reset
+  } = formValidations
+
+  // form data and validations
+  const [firstName, firstNameAttrs] = defineField('firstName')
+  const [lastName, lastNameAttrs] = defineField('lastName')
+  const [emailConfirmation, emailConfirmationAttrs] = defineField('emailConfirmation')
+  const [password, passwordAttrs] = defineField('password')
+  const [passwordConfirmation, passwordConfirmationAttrs] = defineField('passwordConfirmation')
+  const [countryCode, countryCodeAttrs] = defineField('countryCode')
+  const [phoneNumber, phoneNumberAttrs] = defineField('phoneNumber')
+  const [nationality, nationalityAttrs] = defineField('nationality')
 
   // computed
   const passwordError = computed(() => {
@@ -24,42 +46,36 @@
     return errorMessage
   })
   const emailError = computed(() => {
-    if (!isDirty.value || props.email === emailConfirmation.value?.trim()) return ''
+    if (!isDirty.value || props.email.trim() === emailConfirmation.value?.trim()) return ''
     let errorMessage = 'Emails must match'
     if (errors?.emailConfirmation) {
       errorMessage = errors.emailConfirmation
     }
     return errorMessage
   })
+  const disableSubmit = computed(() => {
+    return (
+        isEmpty(errors)
+        || !isDirty
+        || !isValid
+        || emailError.value
+        || passwordError.value
+        || !password.value
+        || !passwordConfirmation.value
+    )
+  })
 
-  // form data and validations
-  const {
-    isSubmitting,
-    submitError,
-    isDirty,
-    defineField,
-    errors,
-    validateForm,
-  } = useFormValidation(newUserSchema)
-
-  const [firstName, firstNameAttrs] = defineField('firstName')
-  const [lastName, lastNameAttrs] = defineField('lastName')
-  const [emailConfirmation, emailConfirmationAttrs] = defineField('emailConfirmation')
-  const [password, passwordAttrs] = defineField('password')
-  const [passwordConfirmation, passwordConfirmationAttrs] = defineField('passwordConfirmation')
-  const [countryCode, countryCodeAttrs] = defineField('countryCode')
-  const [phoneNumber, phoneNumberAttrs] = defineField('phoneNumber')
-  const [nationality, nationalityAttrs] = defineField('nationality')
 
   // methods
-  const emitHide = () => {
+  const goBack = () => {
+    reset()
     emit('hide')
   }
   const emitLogin = (user) => emit('newUserLogin', user)
   const handleNewUser = async () => {
     try {
       const formData = {
-        email: props.email,
+        email: props.email.trim(),
         password: password.value,
         first_name: firstName.value,
         last_name: lastName.value,
@@ -73,10 +89,10 @@
     }
   }
   const handleSubmit = async () => {
-    const formIsValid = await validateForm()
+    const formValidation = await validateForm()
 
-    if (!formIsValid) {
-      // add error stuff here
+    if (!formValidation.valid) {
+      submitError.value = 'Invalid data: ' + Object.keys(formValidation.errors)
       console.log("Aborting form submission: Form data not valid")
       return
     }
@@ -93,7 +109,7 @@
 </script>
 <template>
   <Fieldset legend="Sign Up">
-    <Button severity="secondary" variant="text" @click="emitHide">
+    <Button severity="secondary" variant="text" @click="goBack">
       <i class="pi pi-arrow-left m-2"></i>
       <span>Back</span>
     </Button>
@@ -186,8 +202,9 @@
         class="w-75 mt-2"
         label="Sign Up"
         type="submit"
+        :disabled="disableSubmit"
       />
-<!--        :disabled="disableSubmit"-->
+      <small v-if="submitError" class="text-red-400">{{ submitError }}</small>
     </Form>
   </Fieldset>
 </template>

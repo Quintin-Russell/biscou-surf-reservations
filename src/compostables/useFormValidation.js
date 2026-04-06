@@ -32,8 +32,7 @@ export function useFormValidation(schema, initialValues = {}) {
 
   // methods
   const validateForm = async () => {
-    const result = await validate()
-    return result.valid
+    return await validate()
   }
   const getValues = () => {
     return { ...values }
@@ -45,7 +44,8 @@ export function useFormValidation(schema, initialValues = {}) {
         submitError.value = null
         await callback(values)
       } catch(e) {
-        submitError.value = e.message
+        console.error('Error submitting a form: ', e)
+        submitError.value = 'Something went wrong'
         throw e
       } finally {
         isSubmitting.value = false
