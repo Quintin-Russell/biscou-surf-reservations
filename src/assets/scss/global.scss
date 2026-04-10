@@ -19,3 +19,8 @@
 .font-size-4 { font-size: $font-size-4 }
 .font-size-5 { font-size: $font-size-5 }
 .font-size-6 { font-size: $font-size-6 }
+
+.whole-page {
+  width: 100vw;
+  height: 100vh;
+}

@@ -1,7 +1,9 @@
 <script setup>
+import LoadingSpinner from '@/components/LoadingSpinner.vue'
+
 import { useMeStore } from "@/stores/index.js"
 import { onMounted, ref } from "vue";
-import {useRouter} from "vue-router";
+import { useRouter } from "vue-router";
 
 const meStore = useMeStore()
 const router = useRouter()
@@ -19,9 +21,7 @@ onMounted(async () => {
 </script>
 
 <template>
-  <div v-if="loading">
-    Loading....
-  </div>
+  <LoadingSpinner v-if="loading" width="10rem" height="10rem" />
   <router-view v-else />
 </template>
 

@@ -6,13 +6,13 @@ import { ref, computed, defineProps, defineEmits, inject } from 'vue'
 import { authService } from '@/services'
 
 // props
-const props = defineProps(['email', 'password', 'error'])
+const props = defineProps(['email', 'password'])
 
 // emits
-const emit = defineEmits(['login', 'isNewUser', 'update:email', 'update:password'])
+const emit = defineEmits(['login', 'reset', 'isNewUser', 'update:email', 'update:password'])
 
 // inject
-inject('formValidations')
+const { errors, submitError } = inject('formValidations')
 
 // refs
 const emailExists = ref(false)
@@ -33,6 +33,7 @@ const buttonProps = computed(() => {
   return couldBeNewUser.value ? splitView : onlyPrimary
 })
 const primaryButtonText = computed(() => couldBeNewUser.value ? 'Try again' : 'Next')
+const emailError = computed(() => 'email' in errors)
 
 // methods
 const checkIfEmailIsUser = async function () {
@@ -61,6 +62,11 @@ const updatePassword = (newPasswordValue) => {
   emit('update:password', newPasswordValue)
 }
 
+const emitReset = () => {
+  emailExists.value = false
+  emit('reset')
+}
+
 const onSubmit = function () {
   emit('login')
 }
@@ -68,17 +74,17 @@ const onSubmit = function () {
 
 <template>
   <Form class="flex justify-center flex-col gap-4" @submit="onSubmit">
-    <div class="flex flex-col gap-1 px-2">
+    <div class="flex flex-col gap-1">
       <InputText
           :model-value="email"
           email
           name="email"
           type="text"
           placeholder="Email"
-          :invalid="error"
+          :invalid="emailError"
           @update:model-value="updateEmail"
       />
-      <small v-if="error" class="text-red-400">{{ error }}</small>
+      <small v-if="emailError" class="text-red-400">{{ emailError }}</small>
       <div class="w-full">
         <div
             v-if="'secondaryText' in buttonProps"
@@ -86,7 +92,7 @@ const onSubmit = function () {
         >
           Hmm, we don't recognize that email
         </div>
-        <div class="flex w-full justify-between">
+        <div v-if="!submitError" class="flex w-full justify-between">
           <Button
               v-if="!emailExists"
               :class="buttonProps.class"
@@ -118,14 +124,28 @@ const onSubmit = function () {
         v-if="emailExists"
         :disabled="!password.length"
         type="submit"
-        severity="secondary"
+        :severity="submitError ? 'danger' : 'secondary'"
+        :variant="submitError && 'outlined'"
         label="Submit"
     />
+    <div v-if="submitError" class="flex flex-col justify-center">
+      <small class="m-auto text-red-400">{{ submitError }}</small>
+      <br />
+      <Button
+        class="w-50 m-auto"
+        severity="secondary"
+        label="Try Again"
+        @click="emitReset"
+      />
+    </div>
   </Form>
 </template>
 
 <style scoped>
 ::v-deep .p-password > input {
   width: 100%;
+}
+[data-p="outlined"] {
+  border-color: red !important;
 }
 </style>
