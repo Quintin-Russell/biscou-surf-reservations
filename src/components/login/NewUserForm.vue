@@ -1,4 +1,5 @@
 <script setup>
+  import LoadingSpinner from "@/components/LoadingSpinner.vue";
   import { Form } from '@primevue/forms'
   import {InputText, Fieldset, Select, Button, Password} from "primevue"
 
@@ -88,7 +89,10 @@
       throw e
     }
   }
+
   const handleSubmit = async () => {
+    isSubmitting.value = true
+
     const formValidation = await validateForm()
 
     if (!formValidation.valid) {
@@ -98,7 +102,6 @@
     }
 
     try {
-      isSubmitting.value = true
       await handleNewUser()
     } catch (e) {
       submitError.value = e.message
@@ -108,7 +111,8 @@
   }
 </script>
 <template>
-  <Fieldset legend="Sign Up">
+  <LoadingSpinner v-if="isSubmitting" wholePage />
+  <Fieldset v-else legend="Sign Up">
     <Button severity="secondary" variant="text" @click="goBack">
       <i class="pi pi-arrow-left m-2"></i>
       <span>Back</span>
