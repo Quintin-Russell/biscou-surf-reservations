@@ -2,7 +2,7 @@
 import { Menubar, Menu, Button, Divider } from "primevue"
 import { useMeStore } from "@/stores/index.js"
 import { useRouter } from "vue-router"
-import { ref } from "vue"
+import { computed, ref } from "vue"
 import { capitalize } from "lodash"
 
 const props = defineProps(['navItems'])
@@ -10,9 +10,17 @@ const meStore = useMeStore()
 const router = useRouter()
 
 const menu = ref()
-const items = ref([
+const items = computed(() => [
   {
-    label: "Home"
+    label: "Home",
+    icon: "pi pi-home",
+    command: () => router.push('/home')
+  },
+  {
+    label: "User Management",
+    icon: "pi pi-users",
+    visible: meStore.isManagement,
+    command: () => router.push({ name: 'ManagementUsers' })
   }
 ])
 

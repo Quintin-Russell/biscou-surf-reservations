@@ -83,7 +83,7 @@
         phone_number: `${countryCode.value}${phoneNumber.value}`,
         nationality: nationality.value,
       }
-      const user = await userService.create(formData)
+      const user = await userService.signup(formData)
       emitLogin(user)
     } catch (e) {
       throw e

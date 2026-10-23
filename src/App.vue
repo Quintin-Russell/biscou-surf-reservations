@@ -1,5 +1,6 @@
 <script setup>
 import LoadingSpinner from '@/components/LoadingSpinner.vue'
+import { Toast, ConfirmPopup } from 'primevue'
 
 import { useMeStore } from "@/stores/index.js"
 import { onMounted, ref } from "vue";
@@ -23,6 +24,8 @@ onMounted(async () => {
 <template>
   <LoadingSpinner v-if="loading" width="10rem" height="10rem" />
   <router-view v-else />
+  <Toast />
+  <ConfirmPopup />
 </template>
 
 <style scoped>
