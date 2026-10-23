@@ -3,17 +3,27 @@ import { authService } from "@/services/index.js"
 
 export const useMeStore = defineStore('me', {
   state: () => ({
-    me: null
+    me: null,
+    loadMePromise: null
   }),
-  getters: {},
+  getters: {
+    isManagement: (state) => !!state.me?.is_management
+  },
   actions: {
     async initialize(router) {
-      try {
-        const res = await authService.verifyMe()
-        await this.setMe(res?.data || res, router)
-      } catch (err) {
-        console.error('Could not set user: ', err)
+      await this.loadMe()
+      await this.setMe(this.me, router)
+    },
+    async loadMe() {
+      if (this.me) return this.me
+      if (!this.loadMePromise) {
+        this.loadMePromise = authService.verifyMe()
+          .then(res => { this.me = res?.data || res })
+          .catch(err => { console.error('Could not set user: ', err) })
+          .finally(() => { this.loadMePromise = null })
       }
+      await this.loadMePromise
+      return this.me
     },
     async login(params, router) {
       const res = await authService.login(params)
@@ -26,7 +36,9 @@ export const useMeStore = defineStore('me', {
     },
     async setMe(me,router) {
       this.me = me
-      if (this.me?.id) await router.push('/home')
+      if (!this.me?.id) return
+      await router.isReady()
+      if (router.currentRoute.value.name === 'Login') await router.push('/home')
     }
   }
 })

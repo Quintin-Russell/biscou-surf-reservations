@@ -4,6 +4,8 @@ import router from "@/router/index.js";
 import { createPinia } from 'pinia'
 // 3rd-party packages
 import PrimeVue from 'primevue/config'
+import ToastService from 'primevue/toastservice'
+import ConfirmationService from 'primevue/confirmationservice'
 import Aura from '@primeuix/themes/aura'
 // necessary app startup
 import { webSocketService } from './services'
@@ -15,13 +17,15 @@ import App from '@/App.vue'
 import { createApp } from 'vue'
 
 const app = createApp(App)
-  .use(router)
   .use(createPinia())
+  .use(router)
   .use(PrimeVue, {
     theme: {
       preset: Aura
     }
   })
+  .use(ToastService)
+  .use(ConfirmationService)
 
 webSocketService.init()
 
