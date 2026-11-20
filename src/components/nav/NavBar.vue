@@ -21,6 +21,11 @@ const items = computed(() => [
     icon: "pi pi-users",
     visible: meStore.isManagement,
     command: () => router.push({ name: 'ManagementUsers' })
+  },
+  {
+    label: "My Profile",
+    icon: "pi pi-user",
+    command: () => router.push({ name: 'ManagementProfile' })
   }
 ])
 

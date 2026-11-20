@@ -1,10 +1,10 @@
 <script setup>
 import { Column, DataTable, Tab, TabList, TabPanel, TabPanels, Tabs } from "primevue"
 import { useConfirm } from "primevue/useconfirm"
-import { useToast } from "primevue/usetoast"
 import { computed, onMounted, ref } from "vue"
 import LoadingSpinner from "@/components/LoadingSpinner.vue"
 import UserForm from "./UserForm.vue"
+import { displayToast } from "@/compostables/displayToast.js"
 import { useUsersStore } from "@/stores/index.js"
 
 const TABS = {
@@ -14,7 +14,7 @@ const TABS = {
 
 const usersStore = useUsersStore()
 const confirm = useConfirm()
-const toast = useToast()
+const { notifyError } = displayToast()
 
 const activeTab = ref(TABS.EMPLOYEES)
 const selectedUser = ref(null)
@@ -29,11 +29,7 @@ onMounted(async () => {
   try {
     await usersStore.fetchUsers()
   } catch (e) {
-    console.error(e)
-    const detail = e?.response?.status === 403
-      ? 'You need manager or admin permission to view users.'
-      : 'Please try again.'
-    toast.add({ severity: 'error', summary: 'Could not load users', detail, life: 5000 })
+    notifyError('Could not load users', e, { 403: 'You need manager or admin permission to view users.' })
   }
 })
 
