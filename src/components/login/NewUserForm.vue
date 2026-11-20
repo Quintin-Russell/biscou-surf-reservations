@@ -1,9 +1,10 @@
 <script setup>
   import LoadingSpinner from "@/components/LoadingSpinner.vue";
+  import PasswordFields from "@/components/PasswordFields.vue";
   import { Form } from '@primevue/forms'
-  import {InputText, Fieldset, Select, Button, Password} from "primevue"
+  import {InputText, Fieldset, Select, Button} from "primevue"
 
-  import { defineProps, defineEmits, computed, inject } from "vue"
+  import { defineProps, defineEmits, computed, inject, ref } from "vue"
   import { isEmpty } from "lodash"
   import countryData from '@/helpers/country-data.js'
   import { userService } from "@/services"
@@ -31,21 +32,14 @@
   const [firstName, firstNameAttrs] = defineField('firstName')
   const [lastName, lastNameAttrs] = defineField('lastName')
   const [emailConfirmation, emailConfirmationAttrs] = defineField('emailConfirmation')
-  const [password, passwordAttrs] = defineField('password')
-  const [passwordConfirmation, passwordConfirmationAttrs] = defineField('passwordConfirmation')
+  const [password] = defineField('password')
+  const [passwordConfirmation] = defineField('passwordConfirmation')
   const [countryCode, countryCodeAttrs] = defineField('countryCode')
   const [phoneNumber, phoneNumberAttrs] = defineField('phoneNumber')
   const [nationality, nationalityAttrs] = defineField('nationality')
+  const passwordValid = ref(false)
 
   // computed
-  const passwordError = computed(() => {
-    if (!password.value?.length || password.value === passwordConfirmation.value?.trim()) return ""
-    let errorMessage = 'Passwords must match'
-    if (errors?.passwordConfirmation) {
-      errorMessage = errors.passwordConfirmation
-    }
-    return errorMessage
-  })
   const emailError = computed(() => {
     if (!isDirty.value || props.email.trim() === emailConfirmation.value?.trim()) return ''
     let errorMessage = 'Emails must match'
@@ -60,9 +54,7 @@
         || !isDirty
         || !isValid
         || emailError.value
-        || passwordError.value
-        || !password.value
-        || !passwordConfirmation.value
+        || !passwordValid.value
     )
   })
 
@@ -91,17 +83,13 @@
   }
 
   const handleSubmit = async () => {
-    isSubmitting.value = true
-
-    const formValidation = await validateForm()
-
-    if (!formValidation.valid) {
-      submitError.value = 'Invalid data: ' + Object.keys(formValidation.errors)
-      console.log("Aborting form submission: Form data not valid")
-      return
-    }
-
     try {
+      isSubmitting.value = true
+
+      const formValidation = await validateForm()
+
+      if (!formValidation.valid) throw Error("Form data not valid: " + Object.keys(formValidation.errors))
+
       await handleNewUser()
     } catch (e) {
       submitError.value = e.message
@@ -183,25 +171,15 @@
         />
         <small v-if="errors.nationality" class="text-red-400">{{ errors.nationality }}</small>
       </div>
-      <div class="flex mt-2 flex-col w-75">
-        <Password
-          v-model="password"
-          v-bind="passwordAttrs"
-          toggle-mask
-          placeholder="Choose a Password"
-        />
-        <small v-if="errors.password" class="text-red-400">{{ errors.password }}</small>
-      </div>
-      <div class="flex mt-2 flex-col w-75">
-        <Password
-            v-model="passwordConfirmation"
-            v-bind="passwordConfirmationAttrs"
-            :feedback="false"
-            toggle-mask
-            placeholder="Confirm Your Password"
-        />
-        <small v-if="passwordError" class="text-red-400">{{ passwordError }}</small>
-      </div>
+      <PasswordFields
+        v-model:password="password"
+        v-model:confirmation="passwordConfirmation"
+        v-model:valid="passwordValid"
+        class="mt-2 w-75"
+        password-label="Choose a Password"
+        confirmation-label="Confirm Your Password"
+        placeholder-labels
+      />
       <Button
         class="w-75 mt-2"
         label="Sign Up"
@@ -212,8 +190,3 @@
     </Form>
   </Fieldset>
 </template>
-<style scoped>
-::v-deep .p-password-input {
-  width: 100%
-}
-</style>

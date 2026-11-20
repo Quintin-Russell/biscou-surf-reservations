@@ -1,12 +1,15 @@
 <script setup>
 import { Button } from "primevue"
-import { ref } from "vue"
+import { computed, ref } from "vue"
+import { useMeStore } from "@/stores/index.js"
 
+const meStore = useMeStore()
 const collapsed = ref(false)
 // add future management options here (each needs a child route under /management)
-const options = [
-  { label: 'Users', icon: 'pi pi-users', to: { name: 'ManagementUsers' } }
-]
+const options = computed(() => [
+  ...(meStore.isManagement ? [{ label: 'Users', icon: 'pi pi-users', to: { name: 'ManagementUsers' } }] : []),
+  { label: 'My Profile', icon: 'pi pi-user', to: { name: 'ManagementProfile' } }
+])
 </script>
 
 <template>

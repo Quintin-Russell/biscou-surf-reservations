@@ -22,13 +22,19 @@ const routes = [
     path: '/management',
     component: () => import('@/views/Management.vue'),
     redirect: { name: 'ManagementUsers' },
-    meta: { requiresManagement: true },
+    meta: { requiresAuth: true },
     children: [
       {
         path: 'users',
         name: 'ManagementUsers',
         component: () => import('@/components/management/users/UserManagement.vue'),
-        meta: { title: 'User Management' },
+        meta: { title: 'User Management', requiresManagement: true },
+      },
+      {
+        path: 'profile',
+        name: 'ManagementProfile',
+        component: () => import('@/components/management/profile/ProfilePage.vue'),
+        meta: { title: 'My Profile' },
       }
     ]
   }
@@ -37,11 +43,11 @@ const routes = [
 const router = createRouter({ routes, history: createWebHistory() })
 
 router.beforeEach(async (to) => {
-  if (!to.matched.some(record => record.meta.requiresManagement)) return true
+  if (!to.matched.some(record => record.meta.requiresAuth)) return true
   const meStore = useMeStore()
   const me = await meStore.loadMe()
   if (!me?.id) return { name: 'Login' }
-  if (!meStore.isManagement) return { name: 'Home' }
+  if (to.matched.some(record => record.meta.requiresManagement) && !meStore.isManagement) return { name: 'ManagementProfile' }
   return true
 })
 

@@ -24,9 +24,12 @@ export const useUsersStore = defineStore('users', {
     },
     async updateUser(id, params) {
       const updated = await userService.update(id, params)
-      const index = this.users.findIndex(user => user.id === id)
-      if (index !== -1) this.users.splice(index, 1, updated)
+      this.replaceUser(updated)
       return updated
+    },
+    replaceUser(updated) {
+      const index = this.users.findIndex(user => user.id === updated.id)
+      if (index !== -1) this.users.splice(index, 1, updated)
     }
   }
 })
